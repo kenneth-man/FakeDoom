@@ -1,24 +1,21 @@
 #include <iostream>
+#include <algorithm>
 #include <GLFW/glfw3.h>
-
-// int main() {
-// 	if (!glfwInit()) {
-// 		std::cout << "glfw failed" << std::endl;
-// 		return 1;
-// 	}
-// 	std::cout << "main test" << std::endl;
-// 	return 0;
-// }
 
 int main(void)
 {
+	// Testing if CMake is using C++ 17
+	std::cout << std::clamp(42, -1, 1) << std::endl;
+
      // Initialize GLFW
     if (!glfwInit()) {
         // Handle initialization failure
         return -1;
     }
-// Create a windowed mode window and its OpenGL context
+
+	// Create a windowed mode window and its OpenGL context
     GLFWwindow* window = glfwCreateWindow(640, 480, "Simple GLFW Window", NULL, NULL);
+
     if (!window) {
         glfwTerminate();
         return -1;
@@ -40,5 +37,6 @@ int main(void)
 
     // Clean up
     glfwTerminate();
+
     return 0;
 }
