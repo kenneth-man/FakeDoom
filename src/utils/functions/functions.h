@@ -3,8 +3,8 @@
 
 #include <iostream>
 #include <string>
-#include "../../../external/glad/glad/glad.h"
-#include "../../../external/glfw/include/GLFW/glfw3.h" // <GLFW/glfw3.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 using namespace std;
 

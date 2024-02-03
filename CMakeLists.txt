@@ -27,18 +27,12 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/glfw)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/glad)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-# Specifies include directories (.h) to use when compiling the target
+# Allows usage of angle brackets to include libraries `<>`
+# Otherwise can just use relative paths with ""
 target_include_directories(
 	${PROJECT_NAME}
 	PUBLIC
-	${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include
-)
-
-# Specifies library directories (.cpp) that the linker should search when linking the target
-target_link_directories(
-	${PROJECT_NAME}
-	PRIVATE
-	${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/src
+	${CMAKE_CURRENT_SOURCE_DIR}/external/glad
 )
 
 # Specify libraries or flags to use when linking the target and/or its dependents

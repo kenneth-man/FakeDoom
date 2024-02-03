@@ -1,6 +1,6 @@
 #include <iostream>
 #include <algorithm>
-#include "./external/glad/glad/glad.h"
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "./src/utils/functions/functions.h"
 
