@@ -36,6 +36,7 @@ target_include_directories(
 )
 
 # Specify libraries or flags to use when linking the target and/or its dependents
+# Only need to link libraries that have src files (e.g. .cpp)
 target_link_libraries(
 	${PROJECT_NAME}
 	${GLFW_LIB_VAR}
