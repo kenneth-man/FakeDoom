@@ -55,3 +55,14 @@ void utilsFunctions::initGLAD(const int width, const int height) {
 
 	glViewport(0, 0, width, height);
 }
+
+void utilsFunctions::processInput(GLFWwindow *window) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, true);
+	} 
+}
+
+void utilsFunctions::setBackground(float r, float g, float b, float a) {
+	glClearColor(r, g, b, a);
+	glClear(GL_COLOR_BUFFER_BIT);
+}

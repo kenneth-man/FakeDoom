@@ -13,8 +13,12 @@ int main(int argc, char *argv[]) {
 	GLFWwindow *window {utilsFunctions::initGLFW(windowWidth, windowHeight)};
 	utilsFunctions::initGLAD(windowWidth, windowHeight);
 
+	// render loop
+	// 1 iteration == 1 frame
     while (!glfwWindowShouldClose(window)) {
-		// Do stuff
+		utilsFunctions::processInput(window);
+
+		utilsFunctions::setBackground(0.0f, 0.5f, 0.5f, 1.0f);
 
         // Swap front and back buffers
         glfwSwapBuffers(window);

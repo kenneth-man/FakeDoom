@@ -12,6 +12,8 @@ namespace utilsFunctions {
 	void checkMainCommandArgs(int argc, char *argv[], int &windowWidth, int &windowHeight);
 	GLFWwindow* initGLFW(const int width, const int height);
 	void initGLAD(const int width, const int height);
+	void processInput(GLFWwindow *window);
+	void setBackground(float r, float g, float b, float a);
 }
 
 #endif
