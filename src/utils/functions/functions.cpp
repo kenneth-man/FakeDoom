@@ -154,7 +154,7 @@ unsigned int utilsFunctions::initAndLinkShaderProgram(
 
 unsigned int utilsFunctions::linkVertexAttributes(
 	// when you pass an array, you're passing a pointer/memory address to its first element (since true C arrays don't exist)
-	// meaning you're not actually passing the entire array
+	// meaning you're not actually passing the entire array; so the argument decays into a pointer to its first element
 	float *vertices,
 	size_t verticesSize
 ) {
