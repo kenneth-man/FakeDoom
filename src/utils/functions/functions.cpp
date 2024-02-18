@@ -18,8 +18,7 @@ void utilsFunctions::checkMainCommandArgs(
 		return;
 	}
 
-	cerr << "Add both window width and height arguments to the command";
-	exit(1);
+	utilsFunctions::handleError("Add both window width and height arguments to the command", false);
 }
 
 GLFWwindow *utilsFunctions::initGLFW(
@@ -28,17 +27,13 @@ GLFWwindow *utilsFunctions::initGLFW(
 ) {
 	// Check GLFW initializes correctly
     if (!glfwInit()) {
-		cerr << "Failed to initialize GLFW";
-        glfwTerminate();
-        exit(1);
+		utilsFunctions::handleError("Failed to initialize GLFW");
     }
 
     GLFWwindow *window = glfwCreateWindow(width, height, "FakeDOOM", NULL, NULL);
 
     if (!window) {
-		cerr << "Failed to initialize GLFW Window";
-        glfwTerminate();
-        exit(1);
+		utilsFunctions::handleError("Failed to initialize GLFW Window");
     }
 
     // Make the window's context current
@@ -55,9 +50,7 @@ void utilsFunctions::initGLAD(
 	// Check GLAD initializes correctly
 	// GLAD manages function pointers for OpenGL so we want to initialize GLAD before we call any OpenGL function
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		cerr << "Failed to initialize GLAD";
-        glfwTerminate();
-        exit(1);
+		utilsFunctions::handleError("Failed to initialize GLAD");
     }
 
 	glViewport(0, 0, width, height);
@@ -80,15 +73,7 @@ unsigned int utilsFunctions::initVertexShader() {
 	glCompileShader(vertexShaderId);
 
 	// check if compilation was successful after the call to `glCompileShader`
-	int success;
-	char infoLog[512];
-	glGetShaderiv(vertexShaderId, GL_COMPILE_STATUS, &success);
-
-	if (!success) {
-		glGetShaderInfoLog(vertexShaderId, 512, NULL, infoLog);
-		cerr << "Vertex shader compilation failed\n" << infoLog;
-		exit(1);
-	}
+	utilsFunctions::handleShaderCompileError("Vertex shader compilation failed", vertexShaderId);
 
 	return vertexShaderId;
 }
@@ -106,16 +91,7 @@ unsigned int utilsFunctions::initFragmentShader() {
 	glShaderSource(fragmentShaderId, 1, &fragmentShaderSource, NULL);
 	glCompileShader(fragmentShaderId);
 
-	// check if compilation was successful after the call to `glCompileShader`
-	int success;
-	char infoLog[512];
-	glGetShaderiv(fragmentShaderId, GL_COMPILE_STATUS, &success);
-
-    if (!success) {
-        glGetShaderInfoLog(fragmentShaderId, 512, NULL, infoLog);
-        cerr << "Fragment shader compilation failed\n" << infoLog;
-		exit(1);
-    }
+	utilsFunctions::handleShaderCompileError("Fragment shader compilation failed", fragmentShaderId);
 
 	return fragmentShaderId;
 }
@@ -132,15 +108,7 @@ unsigned int utilsFunctions::initAndLinkShaderProgram(
 	glAttachShader(shaderProgramId, fragmentShaderId);
 	glLinkProgram(shaderProgramId);
 
-	int success;
-    char infoLog[512];
-	glGetProgramiv(shaderProgramId, GL_LINK_STATUS, &success);
-
-	if (!success) {
-		glGetProgramInfoLog(shaderProgramId, 512, NULL, infoLog);
-		cerr << "Shader Program compilation failed\n" << infoLog;
-		exit(1);
-	}
+	utilsFunctions::handleShaderProgramLinkError("Shader Program compilation failed", shaderProgramId);
 
 	// Every shader and rendering call after glUseProgram will now use this program object and it's shaders
 	glUseProgram(shaderProgramId);
@@ -208,3 +176,35 @@ void utilsFunctions::setBackground(
 	glClearColor(r, g, b, a);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
+
+void utilsFunctions::handleError(string message, bool shouldGlfwTerminate) {
+	cerr << message;
+	if (shouldGlfwTerminate) {
+		glfwTerminate();
+	}
+	exit(1);
+}
+
+void utilsFunctions::handleShaderCompileError(string message, unsigned int shaderId) {
+	int success;
+	char infoLog[512];
+	glGetShaderiv(shaderId, GL_COMPILE_STATUS, &success);
+
+	if (!success) {
+		glGetShaderInfoLog(shaderId, 512, NULL, infoLog);
+		cerr << message << '\n' << infoLog;
+		exit(1);
+	}
+}
+
+void utilsFunctions::handleShaderProgramLinkError(string message, unsigned int shaderProgramId) {
+	int success;
+    char infoLog[512];
+	glGetProgramiv(shaderProgramId, GL_LINK_STATUS, &success);
+
+	if (!success) {
+		glGetProgramInfoLog(shaderProgramId, 512, NULL, infoLog);
+		cerr << message << '\n' << infoLog;
+		exit(1);
+	}
+};

@@ -1,10 +1,10 @@
 #ifndef _FUNCTIONS_
 #define _FUNCTIONS_
 
-#include <iostream>
-#include <string>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -19,6 +19,9 @@ namespace utilsFunctions {
 	void processInput(GLFWwindow *window);
 	void processWindowSizeChange(GLFWwindow *window, int width, int height);
 	void setBackground(float r, float g, float b, float a);
+	void handleError(string message, bool shouldGlfwTerminate = true);
+	void handleShaderCompileError(string message, unsigned int shaderId);
+	void handleShaderProgramLinkError(string message, unsigned int shaderProgramId);
 }
 
 #endif
