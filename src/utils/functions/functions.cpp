@@ -124,16 +124,22 @@ unsigned int utilsFunctions::linkVertexAttributes(
 	// when you pass an array, you're passing a pointer/memory address to its first element (since true C arrays don't exist)
 	// meaning you're not actually passing the entire array; so the argument decays into a pointer to its first element
 	float *vertices,
-	size_t verticesSize
+	size_t verticesSize,
+	unsigned int *indices,
+	size_t indicesSize
 ) {
-	unsigned int vertexBufferObjectId, vertextArrayObjectId;
-    glGenVertexArrays(1, &vertextArrayObjectId);
-    glGenBuffers(1, &vertexBufferObjectId);
+	unsigned int vboId, vaoId, eboId;
+    glGenVertexArrays(1, &vaoId);
+    glGenBuffers(1, &vboId);
+	glGenBuffers(1, &eboId);
     // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s)
-    glBindVertexArray(vertextArrayObjectId);
+    glBindVertexArray(vaoId);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObjectId);
+    glBindBuffer(GL_ARRAY_BUFFER, vboId);
     glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize, indices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -141,14 +147,17 @@ unsigned int utilsFunctions::linkVertexAttributes(
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0);
+    glBindVertexArray(0); 
 
 	// uncomment this call to draw in wireframe polygons
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	return vertextArrayObjectId;
+	return vaoId;
 }
 
 void utilsFunctions::processInput(GLFWwindow *window) {

@@ -1,3 +1,5 @@
+# https://learnopengl.com/
+
 ## Graphics pipeline
 - ### 2 main parts:
 	- ### Transform 3D coordinates into 2D coordinates
@@ -18,3 +20,27 @@
 	- ### ***Fragment***
 
 - ### ***Normalized Device Coordinates (NDC)*** = x, y and z values between -1.0 to 1.0. Any coordinates that fall outside this range will be discarded/clipped and won't be visible on your screen
+
+![](./imgs/linking%20vertex%20attributes.png)
+
+- ### Vertex Buffer Objects (VBOs):
+	- ### VBOs are OpenGL buffer objects that store vertex data, such as vertex positions, colors, normals, and so on.
+	- ### They are efficient because they reside in the GPU's memory.
+	- ### Using VBOs allows for faster rendering as the data is already on the GPU, reducing the need to send data back and forth between the CPU and GPU.
+
+- ### Vertex Array Objects (VAOs):
+	- ### VAOs are OpenGL objects that store multiple VBOs and their associated vertex attribute configurations.
+	- ### They allow you to set up and switch between different vertex attribute configurations with a single bind call.
+	- ### VAOs remember all the state specified via glVertexAttribPointer and glEnableVertexAttribArray, so you don't need to reissue those calls every time you want to render a different object.
+	- ### They help in organizing and encapsulating the vertex attribute configurations for rendering.
+
+- ### Element Buffer Objects (EBOs):
+	- ### EBOs are OpenGL buffer objects that store indices that OpenGL uses to decide which vertices to draw.
+	- ### They allow you to re-use vertices, which can save memory and reduce the amount of data sent to the GPU.
+	- ### They also allow you to draw more complex shapes by reusing vertices.
+
+![](./imgs/element%20buffer%20object.png)
+
+![](./imgs/element%20buffer%20object%202.png)
+
+# Up to here - https://learnopengl.com/code_viewer_gh.php?code=src/1.getting_started/2.2.hello_triangle_indexed/hello_triangle_indexed.cpp

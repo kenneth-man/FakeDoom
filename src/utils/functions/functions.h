@@ -15,7 +15,7 @@ namespace utilsFunctions {
 	unsigned int initVertexShader();
 	unsigned int initFragmentShader();
 	unsigned int initAndLinkShaderProgram(unsigned int vertexShaderId, unsigned int fragmentShaderId);
-	unsigned int linkVertexAttributes(float *vertices, size_t verticesSize);
+	unsigned int linkVertexAttributes(float *vertices, size_t verticesSize, unsigned int *indices, size_t indicesSize);
 	void processInput(GLFWwindow *window);
 	void processWindowSizeChange(GLFWwindow *window, int width, int height);
 	void setBackground(float r, float g, float b, float a);
