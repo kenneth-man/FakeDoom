@@ -8,10 +8,10 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 	float vertices[] = {
-         0.5f,  0.5f, 0.0f,  // top right
-         0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left 
+         0.5f,  0.5f, 0.0f,  // top right vertex
+         0.5f, -0.5f, 0.0f,  // bottom right vertex
+        -0.5f, -0.5f, 0.0f,  // bottom left vertex
+        -0.5f,  0.5f, 0.0f   // top left vertex
     };
     unsigned int indices[] = {
         0, 1, 3,  // first Triangle
@@ -19,12 +19,10 @@ int main(int argc, char *argv[]) {
     };
 	int windowWidth;
 	int windowHeight;
+
 	utilsFunctions::checkMainCommandArgs(argc, argv, windowWidth, windowHeight);
 	GLFWwindow *window {utilsFunctions::initGLFW(windowWidth, windowHeight)};
 	utilsFunctions::initGLAD(windowWidth, windowHeight);
-
-	// send input vertex data to the GPU and determine how it should process the data within a vertex and fragment shader
-	// vertex shaders transform shape positions into 3D drawing coordinates; fragment shaders compute the renderings of a shape's colors and other attributes
 	unsigned int vertexShaderId {utilsFunctions::initVertexShader()};
 	unsigned int fragmentShaderId {utilsFunctions::initFragmentShader()};
 	// link both shader objects into a shader program we can use for rendering
@@ -38,9 +36,9 @@ int main(int argc, char *argv[]) {
 		utilsFunctions::processInput(window);
 		utilsFunctions::setBackground(0.0f, 0.5f, 0.5f, 1.0f);
 
-		//glUseProgram(shaderProgramId);
 		glBindVertexArray(vaoId);
-		// glDrawArrays(GL_TRIANGLES, 0, 3);
+		// if no EBO buffer (aka index buffer), use glDrawArrays(GL_TRIANGLES, 0, 3);
+		// draws the currently bound buffer
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // Swap front and back buffers

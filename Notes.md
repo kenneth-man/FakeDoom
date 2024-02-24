@@ -23,6 +23,8 @@
 
 ![](./imgs/linking%20vertex%20attributes.png)
 
+### (an ***attribute*** is a input in vertices e.g. positions, colors, normals, texture coordinate etc.)
+
 - ### Vertex Buffer Objects (VBOs):
 	- ### VBOs are OpenGL buffer objects that store vertex data, such as vertex positions, colors, normals, and so on.
 	- ### They are efficient because they reside in the GPU's memory.
@@ -35,7 +37,7 @@
 	- ### They help in organizing and encapsulating the vertex attribute configurations for rendering.
 
 - ### Element Buffer Objects (EBOs):
-	- ### EBOs are OpenGL buffer objects that store indices that OpenGL uses to decide which vertices to draw.
+	- ### EBOs are OpenGL buffer objects that store indices that tells OpenGL how to connect the vertices and which vertices to draw.
 	- ### They allow you to re-use vertices, which can save memory and reduce the amount of data sent to the GPU.
 	- ### They also allow you to draw more complex shapes by reusing vertices.
 

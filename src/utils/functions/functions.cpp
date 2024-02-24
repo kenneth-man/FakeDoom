@@ -56,6 +56,10 @@ void utilsFunctions::initGLAD(
 	glViewport(0, 0, width, height);
 }
 
+// a shader is a program that runs on your GPU; we can create a vertext, geometry and fragment shader to override GPU defaults (or they may not exist)
+// these shaders are compiled, linked and run on our GPU `glCompileShader`, whilst our C++ program runs on our CPU
+// vertex shader = transforms each vertex's 3D position in virtual space to the 2D coordinate on the screen (in a window)
+	// and gets called for each vertex that is rendered
 unsigned int utilsFunctions::initVertexShader() {
 	// simple vertex shader in GLSL (OpenGL Shading Language); stored in C string
 	const char *vertexShaderSource = "#version 330 core\n"
@@ -78,6 +82,8 @@ unsigned int utilsFunctions::initVertexShader() {
 	return vertexShaderId;
 }
 
+// fragment (pixel) shader = defines RGBA (red, green, blue, alpha) colors for each pixel being processed
+	// and gets called for each pixel that needs to get rasterized (process of drawing to screen, where a window is just a pixel array)
 unsigned int utilsFunctions::initFragmentShader() {
 	const char *fragmentShaderSource = "#version 330 core\n"
     "out vec4 FragColor;\n"
@@ -128,19 +134,27 @@ unsigned int utilsFunctions::linkVertexAttributes(
 	unsigned int *indices,
 	size_t indicesSize
 ) {
-	unsigned int vboId, vaoId, eboId;
+	unsigned int vaoId, vboId, eboId;
+
     glGenVertexArrays(1, &vaoId);
     glGenBuffers(1, &vboId);
 	glGenBuffers(1, &eboId);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s)
+
+    // bind the Vertex Array Object first
     glBindVertexArray(vaoId);
 
+	// use generated VBO buffer and insert data into it with same size as `verticesSize`
     glBindBuffer(GL_ARRAY_BUFFER, vboId);
     glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW);
 
+	// use generated EBO buffer and insert data into it with same size as `indicesSize`
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize, indices, GL_STATIC_DRAW);
 
+	// defining we want position (vertex attribute) coordinates to be at index 0, and how opengl should interpret what consitutes as a vertex from our buffer data in `glBufferData`
+	// 5th arg is `stride` which is the amount of bytes between each vertex (size of each vertex); so that opengl knows how many bytes to jump in the buffer to the next vertex
+	// 6th arg is `pointer` which is the offset in bytes of the attributes in a vertex; e.g. A single vertex may have attributes: position, texture coordinate, normal
+		// `pointer` is the offset of those in bytes in the buffer; e.g. position (offset is 0 since it's first), texture coordinate (12 bytes forward/offset), normal (20 bytes)...
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
