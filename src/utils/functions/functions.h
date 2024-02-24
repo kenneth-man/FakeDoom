@@ -20,8 +20,8 @@ namespace utilsFunctions {
 	void processWindowSizeChange(GLFWwindow *window, int width, int height);
 	void setBackground(float r, float g, float b, float a);
 	void handleError(string message, bool shouldGlfwTerminate = true);
-	void handleShaderCompileError(string message, unsigned int shaderId);
-	void handleShaderProgramLinkError(string message, unsigned int shaderProgramId);
+	void handleShaderCompileError(unsigned int shaderId, string message);
+	void handleShaderProgramLinkError(unsigned int shaderProgramId, string message);
 }
 
 #endif

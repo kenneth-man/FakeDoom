@@ -30,7 +30,7 @@ GLFWwindow *utilsFunctions::initGLFW(
 		utilsFunctions::handleError("Failed to initialize GLFW");
     }
 
-    GLFWwindow *window = glfwCreateWindow(width, height, "FakeDOOM", NULL, NULL);
+    GLFWwindow *window {glfwCreateWindow(width, height, "FakeDOOM", nullptr, nullptr)};
 
     if (!window) {
 		utilsFunctions::handleError("Failed to initialize GLFW Window");
@@ -62,22 +62,22 @@ void utilsFunctions::initGLAD(
 	// and gets called for each vertex that is rendered
 unsigned int utilsFunctions::initVertexShader() {
 	// simple vertex shader in GLSL (OpenGL Shading Language); stored in C string
-	const char *vertexShaderSource = "#version 330 core\n"
+	const char *vertexShaderSource {"#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "void main()\n"
     "{\n"
     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
+    "}\0"};
 	
 	// shader object id
-	unsigned int vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
+	unsigned int vertexShaderId {glCreateShader(GL_VERTEX_SHADER)};
 
 	// attach the shader source code to the shader object and compile the shader
-	glShaderSource(vertexShaderId, 1, &vertexShaderSource, NULL);
+	glShaderSource(vertexShaderId, 1, &vertexShaderSource, nullptr);
 	glCompileShader(vertexShaderId);
 
 	// check if compilation was successful after the call to `glCompileShader`
-	utilsFunctions::handleShaderCompileError("Vertex shader compilation failed", vertexShaderId);
+	utilsFunctions::handleShaderCompileError(vertexShaderId, "Vertex shader compilation failed");
 
 	return vertexShaderId;
 }
@@ -85,19 +85,19 @@ unsigned int utilsFunctions::initVertexShader() {
 // fragment (pixel) shader = defines RGBA (red, green, blue, alpha) colors for each pixel being processed
 	// and gets called for each pixel that needs to get rasterized (process of drawing to screen, where a window is just a pixel array)
 unsigned int utilsFunctions::initFragmentShader() {
-	const char *fragmentShaderSource = "#version 330 core\n"
+	const char *fragmentShaderSource {"#version 330 core\n"
     "out vec4 FragColor;\n"
     "void main()\n"
     "{\n"
     "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\n\0";
+    "}\n\0"};
 	
-	unsigned int fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
+	unsigned int fragmentShaderId {glCreateShader(GL_FRAGMENT_SHADER)};
 
-	glShaderSource(fragmentShaderId, 1, &fragmentShaderSource, NULL);
+	glShaderSource(fragmentShaderId, 1, &fragmentShaderSource, nullptr);
 	glCompileShader(fragmentShaderId);
 
-	utilsFunctions::handleShaderCompileError("Fragment shader compilation failed", fragmentShaderId);
+	utilsFunctions::handleShaderCompileError(fragmentShaderId, "Fragment shader compilation failed");
 
 	return fragmentShaderId;
 }
@@ -106,7 +106,7 @@ unsigned int utilsFunctions::initAndLinkShaderProgram(
 	unsigned int vertexShaderId,
 	unsigned int fragmentShaderId
 ) {
-	unsigned int shaderProgramId = glCreateProgram();
+	unsigned int shaderProgramId {glCreateProgram()};
 
 	// link vertex and fragment shaders to a shader program object
 	// linking the outputs of each shader to the inputs of the next shader
@@ -114,7 +114,7 @@ unsigned int utilsFunctions::initAndLinkShaderProgram(
 	glAttachShader(shaderProgramId, fragmentShaderId);
 	glLinkProgram(shaderProgramId);
 
-	utilsFunctions::handleShaderProgramLinkError("Shader Program compilation failed", shaderProgramId);
+	utilsFunctions::handleShaderProgramLinkError(shaderProgramId, "Shader Program compilation failed");
 
 	// Every shader and rendering call after glUseProgram will now use this program object and it's shaders
 	glUseProgram(shaderProgramId);
@@ -200,7 +200,10 @@ void utilsFunctions::setBackground(
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void utilsFunctions::handleError(string message, bool shouldGlfwTerminate) {
+void utilsFunctions::handleError(
+	string message,
+	bool shouldGlfwTerminate
+) {
 	cerr << message;
 	if (shouldGlfwTerminate) {
 		glfwTerminate();
@@ -208,25 +211,32 @@ void utilsFunctions::handleError(string message, bool shouldGlfwTerminate) {
 	exit(1);
 }
 
-void utilsFunctions::handleShaderCompileError(string message, unsigned int shaderId) {
+// `iv` = integer vector
+void utilsFunctions::handleShaderCompileError(
+	unsigned int shaderId,
+	string message
+) {
 	int success;
 	char infoLog[512];
 	glGetShaderiv(shaderId, GL_COMPILE_STATUS, &success);
 
 	if (!success) {
-		glGetShaderInfoLog(shaderId, 512, NULL, infoLog);
+		glGetShaderInfoLog(shaderId, 512, nullptr, infoLog);
 		cerr << message << '\n' << infoLog;
 		exit(1);
 	}
 }
 
-void utilsFunctions::handleShaderProgramLinkError(string message, unsigned int shaderProgramId) {
+void utilsFunctions::handleShaderProgramLinkError(
+	unsigned int shaderProgramId,
+	string message
+) {
 	int success;
     char infoLog[512];
 	glGetProgramiv(shaderProgramId, GL_LINK_STATUS, &success);
 
 	if (!success) {
-		glGetProgramInfoLog(shaderProgramId, 512, NULL, infoLog);
+		glGetProgramInfoLog(shaderProgramId, 512, nullptr, infoLog);
 		cerr << message << '\n' << infoLog;
 		exit(1);
 	}

@@ -46,7 +46,13 @@
 		"stdexcept": "cpp",
 		"streambuf": "cpp",
 		"cinttypes": "cpp",
-		"typeinfo": "cpp"
+		"typeinfo": "cpp",
+		"codecvt": "cpp",
+		"ctime": "cpp",
+		"ratio": "cpp",
+		"fstream": "cpp",
+		"iomanip": "cpp",
+		"sstream": "cpp"
 	},
 	"workbench.tree.enableStickyScroll": false
 }
