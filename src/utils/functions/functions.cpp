@@ -147,7 +147,9 @@ unsigned int utilsFunctions::linkVertexAttributes(
     glBindBuffer(GL_ARRAY_BUFFER, vboId);
     glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW);
 
-	// use generated EBO buffer and insert data into it with same size as `indicesSize`
+	// use generated EBO (index) buffer and insert data into it with same size as `indicesSize`
+	// EBO buffers allow us to re-use existing vertices, limiting amount of GPU needed (duplicate vertices require more memory)
+	// EBO buffers must be made up of unsigned integers
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize, indices, GL_STATIC_DRAW);
 

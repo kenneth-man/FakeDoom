@@ -8,7 +8,33 @@
 #include <string>
 #include "./src/utils/functions/functions.h"
 
+// macro to wrap an opengl function call to check and log errors
+// `#x` converts `x` to a string
+// `\` allows you to line break onto seperate lines
+#define gLCall(x) glClearError();\
+	x;\
+	glLogError(#x, __FILE__, __LINE__)
+
 using namespace std;
+
+static void glClearError() {
+	// `GL_NO_ERROR` is guaranteed to be 0
+	while (glGetError() != GL_NO_ERROR) {}
+}
+
+static void glLogError(
+	const char *function,
+	const char *file,
+	int line
+) {
+	// will keep running unless `error` variable is not 0
+	while (GLenum error = glGetError()) {
+		cout << "==========================" << '\n' <<
+		"OpenGL Error: " << error << '\n' <<
+		"Function: " << function << '\n' <<
+		"File: " << file << ":" << line << endl;
+	}
+}
 
 struct ShaderProgramSrc {
 	string vertexSrc;
@@ -108,10 +134,10 @@ static unsigned int createShaders(
 
 int main(int argc, char *argv[]) {
 	float vertices[] = {
-         0.5f,  0.5f, 0.0f,  // top right vertex
-         0.5f, -0.5f, 0.0f,  // bottom right vertex
-        -0.5f, -0.5f, 0.0f,  // bottom left vertex
-        -0.5f,  0.5f, 0.0f   // top left vertex
+        0.5f, 0.5f, 0.0f,  // top right vertex
+        0.5f, -0.5f, 0.0f,  // bottom right vertex
+		-0.5f, -0.5f, 0.0f,  // bottom left vertex
+		-0.5f, 0.5f, 0.0f   // top left vertex
     };
     unsigned int indices[] = {
         0, 1, 3,  // first Triangle
@@ -145,7 +171,7 @@ int main(int argc, char *argv[]) {
 
 		// draws the currently bound buffer
 		// if no EBO buffer (aka index buffer), then use `glDrawArrays(GL_TRIANGLES, 0, 3);`
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		gLCall(glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, nullptr));
 
         // Swap front and back buffers
         glfwSwapBuffers(window);
