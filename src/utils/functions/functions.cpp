@@ -30,6 +30,10 @@ GLFWwindow *utilsFunctions::initGLFW(
 		utilsFunctions::handleError("Failed to initialize GLFW");
     }
 
+	// glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	// glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	// glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
     GLFWwindow *window {glfwCreateWindow(width, height, "FakeDOOM", nullptr, nullptr)};
 
     if (!window) {
@@ -141,22 +145,16 @@ unsigned int utilsFunctions::linkVertexAttributes(
 ) {
 	unsigned int vaoId, vboId, eboId;
 
+	// VAOs (stored in CPU memory); tells OpenGL how to find and use vertex data in VBOs (vertex buffers) when rendering
+	// VBOs (stored in GPU memory, so prevents GPU-CPU communication bottleneck, improve efficiency) stores the actual vertex data attributes (positions, normals, texture coords...)
+	// `glVertexAttribPointer` links a VAO with the currently bound VBO
     glGenVertexArrays(1, &vaoId);
-    glGenBuffers(1, &vboId);
-	glGenBuffers(1, &eboId);
-
-    // Bind the Vertex Array Object first
     glBindVertexArray(vaoId);
 
 	// Use generated VBO buffer and insert data into it with same size as `verticesSize`
-    glBindBuffer(GL_ARRAY_BUFFER, vboId);
+    glGenBuffers(1, &vboId);
+	glBindBuffer(GL_ARRAY_BUFFER, vboId);
     glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW);
-
-	// Use generated EBO (index) buffer and insert data into it with same size as `indicesSize`
-	// EBO buffers allow us to re-use existing vertices, limiting amount of GPU needed (duplicate vertices require more memory)
-	// EBO buffers must be made up of unsigned integers
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize, indices, GL_STATIC_DRAW);
 
 	// Defining we want position (vertex attribute) coordinates to be at index 0, and how opengl should interpret what consitutes as a vertex from our buffer data in `glBufferData`
 	// 5th arg is `stride` which is the amount of bytes between each vertex (size of each vertex); so that opengl knows how many bytes to jump in the buffer to the next vertex
@@ -165,15 +163,12 @@ unsigned int utilsFunctions::linkVertexAttributes(
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // Remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0); 
+	// Use generated EBO (index) buffer and insert data into it with same size as `indicesSize`
+	// EBO buffers allow us to re-use existing vertices, limiting amount of GPU needed (duplicate vertices require more memory)
+	// EBO buffers must be made up of unsigned integers
+	glGenBuffers(1, &eboId);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize, indices, GL_STATIC_DRAW); 
 
 	// Uncomment this call to draw in wireframe polygons
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
