@@ -8,7 +8,7 @@
 #include <string>
 #include "./src/utils/functions/functions.h"
 
-// macro to wrap an opengl function call to check and log errors
+// Macro to wrap an opengl function call to check and log errors
 // `#x` converts `x` to a string
 // `\` allows you to line break onto seperate lines
 #define gLCall(x) glClearError();\
@@ -27,7 +27,7 @@ static void glLogError(
 	const char *file,
 	int line
 ) {
-	// will keep running unless `error` variable is not 0
+	// Will keep running unless `error` variable is not 0
 	while (GLenum error = glGetError()) {
 		cout << "==========================" << '\n' <<
 		"OpenGL Error: " << error << '\n' <<
@@ -116,7 +116,7 @@ static unsigned int createShaders(
 	unsigned int vertexShaderId {compileShader(GL_VERTEX_SHADER, vertexShaderSrc)};
 	unsigned int fragmentShaderId {compileShader(GL_FRAGMENT_SHADER, fragmentShaderSrc)};
 
-	// link shaders to a shader program
+	// Link shaders to a shader program
 	glAttachShader(programId, vertexShaderId);
 	glAttachShader(programId, fragmentShaderId);
 	glLinkProgram(programId);
@@ -124,8 +124,8 @@ static unsigned int createShaders(
 
 	utilsFunctions::handleShaderProgramLinkError(programId, "Shader Program compilation failed");
 
-	// cleanup the generated shader intermediate .obj files from c++ compilation
-	// already stored inside the shader program and we no longer need them anymore
+	// Cleanup the generated shader intermediate .obj files from c++ compilation
+	// Already stored inside the shader program and we no longer need them anymore
 	glDeleteShader(vertexShaderId);
 	glDeleteShader(fragmentShaderId);
 
@@ -134,14 +134,14 @@ static unsigned int createShaders(
 
 int main(int argc, char *argv[]) {
 	float vertices[] = {
-        0.5f, 0.5f, 0.0f,  // top right vertex
-        0.5f, -0.5f, 0.0f,  // bottom right vertex
-		-0.5f, -0.5f, 0.0f,  // bottom left vertex
-		-0.5f, 0.5f, 0.0f   // top left vertex
+        0.5f, 0.5f, 0.0f,  // Top right vertex
+        0.5f, -0.5f, 0.0f,  // Bottom right vertex
+		-0.5f, -0.5f, 0.0f,  // Bottom left vertex
+		-0.5f, 0.5f, 0.0f   // Top left vertex
     };
     unsigned int indices[] = {
-        0, 1, 3,  // first Triangle
-        1, 2, 3   // second Triangle
+        0, 1, 3,  // First triangle
+        1, 2, 3   // Second triangle
     };
 	int windowWidth;
 	int windowHeight;
@@ -150,7 +150,7 @@ int main(int argc, char *argv[]) {
 	GLFWwindow *window {utilsFunctions::initGLFW(windowWidth, windowHeight)};
 	utilsFunctions::initGLAD(windowWidth, windowHeight);
 	
-	// the `.exe` file path will be the same regardless when executing debug or release
+	// The `.exe` file path will be the same regardless when executing debug or release
 	// e.g. `build/Debug/FakeDoom.exe` or `build/Release/FakeDoom.exe`
 	ShaderProgramSrc src {parseShader(
 		filesystem::current_path().parent_path().parent_path().string() +
@@ -158,19 +158,38 @@ int main(int argc, char *argv[]) {
 	)};
 	unsigned int programId {createShaders(src.vertexSrc, src.fragmentSrc)};
 	glUseProgram(programId);
-	// telling OpenGL how it should interpret the vertex data in memory and how it should connect the vertex data to the vertex shader's attributes
+
+	// Uniforms are set per draw; need to be setup before `glDrawElements` or `glDrawArrays`
+	// Attributes are set per vertex
+	// Here we are setting a uniform variable in our fragment shader
+	int location {glGetUniformLocation(programId, "uniformColor")};
+	glUniform4f(location, 1.0f, 0.0f, 0.0f, 1.0f);
+	float r {0.0f};
+	float increment {0.05f};
+
+	// Telling OpenGL how it should interpret the vertex data in memory and how it should connect the vertex data to the vertex shader's attributes
 	unsigned int vaoId {utilsFunctions::linkVertexAttributes(vertices, sizeof(vertices), indices, sizeof(indices))};
 
-	// render loop
+	// Render loop
 	// 1 iteration == 1 frame
     while (!glfwWindowShouldClose(window)) {
 		utilsFunctions::processInput(window);
 		utilsFunctions::setBackground(0.0f, 0.5f, 0.5f, 1.0f);
 
+		if (r > 1.0f) {
+			increment = -0.05f;
+		} else if (r < 0.0f) {
+			increment = 0.05f;
+		}
+
+		r += increment;
+		
+		glUniform4f(location, r, 0.0f, 0.0f, 1.0f);
+
 		glBindVertexArray(vaoId);
 
-		// draws the currently bound buffer
-		// if no EBO buffer (aka index buffer), then use `glDrawArrays(GL_TRIANGLES, 0, 3);`
+		// Draws the currently bound buffer
+		// If no EBO buffer (aka index buffer), then use `glDrawArrays(GL_TRIANGLES, 0, 3);`
 		gLCall(glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, nullptr));
 
         // Swap front and back buffers

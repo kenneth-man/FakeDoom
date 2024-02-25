@@ -38,6 +38,11 @@ GLFWwindow *utilsFunctions::initGLFW(
 
     // Make the window's context current
     glfwMakeContextCurrent(window);
+
+	// The number of screen updates to wait from the time glfwSwapBuffers was called before swapping the buffers and returning.
+	// This is sometimes called vertical synchronization, vertical retrace synchronization or just vsync
+	glfwSwapInterval(1);
+
 	glfwSetFramebufferSizeCallback(window, processWindowSizeChange);
 
 	return window;
@@ -56,12 +61,12 @@ void utilsFunctions::initGLAD(
 	glViewport(0, 0, width, height);
 }
 
-// a shader is a program that runs on your GPU; we can create a vertext, geometry and fragment shader to override GPU defaults (or they may not exist)
-// these shaders are compiled, linked and run on our GPU `glCompileShader`, whilst our C++ program runs on our CPU
-// vertex shader = transforms each vertex's 3D position in virtual space to the 2D coordinate on the screen (in a window)
+// A shader is a program that runs on your GPU; we can create a vertext, geometry and fragment shader to override GPU defaults (or they may not exist)
+// These shaders are compiled, linked and run on our GPU `glCompileShader`, whilst our C++ program runs on our CPU
+// Vertex shader = transforms each vertex's 3D position in virtual space to the 2D coordinate on the screen (in a window)
 	// and gets called for each vertex that is rendered
 unsigned int utilsFunctions::initVertexShader() {
-	// simple vertex shader in GLSL (OpenGL Shading Language); stored in C string
+	// Simple vertex shader in GLSL (OpenGL Shading Language); stored in C string
 	const char *vertexShaderSource {"#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "void main()\n"
@@ -69,20 +74,20 @@ unsigned int utilsFunctions::initVertexShader() {
     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
     "}\0"};
 	
-	// shader object id
+	// Shader object id
 	unsigned int vertexShaderId {glCreateShader(GL_VERTEX_SHADER)};
 
-	// attach the shader source code to the shader object and compile the shader
+	// Attach the shader source code to the shader object and compile the shader
 	glShaderSource(vertexShaderId, 1, &vertexShaderSource, nullptr);
 	glCompileShader(vertexShaderId);
 
-	// check if compilation was successful after the call to `glCompileShader`
+	// Check if compilation was successful after the call to `glCompileShader`
 	utilsFunctions::handleShaderCompileError(vertexShaderId, "Vertex shader compilation failed");
 
 	return vertexShaderId;
 }
 
-// fragment (pixel) shader = defines RGBA (red, green, blue, alpha) colors for each pixel being processed
+// Fragment (pixel) shader = defines RGBA (red, green, blue, alpha) colors for each pixel being processed
 	// and gets called for each pixel that needs to get rasterized (process of drawing to screen, where a window is just a pixel array)
 unsigned int utilsFunctions::initFragmentShader() {
 	const char *fragmentShaderSource {"#version 330 core\n"
@@ -108,8 +113,8 @@ unsigned int utilsFunctions::initAndLinkShaderProgram(
 ) {
 	unsigned int shaderProgramId {glCreateProgram()};
 
-	// link vertex and fragment shaders to a shader program object
-	// linking the outputs of each shader to the inputs of the next shader
+	// Link vertex and fragment shaders to a shader program object
+	// Linking the outputs of each shader to the inputs of the next shader
 	glAttachShader(shaderProgramId, vertexShaderId);
 	glAttachShader(shaderProgramId, fragmentShaderId);
 	glLinkProgram(shaderProgramId);
@@ -119,7 +124,7 @@ unsigned int utilsFunctions::initAndLinkShaderProgram(
 	// Every shader and rendering call after glUseProgram will now use this program object and it's shaders
 	glUseProgram(shaderProgramId);
 
-	// cleanup shader objects; no longer need them anymore
+	// Cleanup shader objects; no longer need them anymore
 	glDeleteShader(vertexShaderId);
 	glDeleteShader(fragmentShaderId);
 
@@ -127,8 +132,8 @@ unsigned int utilsFunctions::initAndLinkShaderProgram(
 }
 
 unsigned int utilsFunctions::linkVertexAttributes(
-	// when you pass an array, you're passing a pointer/memory address to its first element (since true C arrays don't exist)
-	// meaning you're not actually passing the entire array; so the argument decays into a pointer to its first element
+	// When you pass an array, you're passing a pointer/memory address to its first element (since true C arrays don't exist)
+	// Meaning you're not actually passing the entire array; so the argument decays into a pointer to its first element
 	float *vertices,
 	size_t verticesSize,
 	unsigned int *indices,
@@ -140,37 +145,37 @@ unsigned int utilsFunctions::linkVertexAttributes(
     glGenBuffers(1, &vboId);
 	glGenBuffers(1, &eboId);
 
-    // bind the Vertex Array Object first
+    // Bind the Vertex Array Object first
     glBindVertexArray(vaoId);
 
-	// use generated VBO buffer and insert data into it with same size as `verticesSize`
+	// Use generated VBO buffer and insert data into it with same size as `verticesSize`
     glBindBuffer(GL_ARRAY_BUFFER, vboId);
     glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW);
 
-	// use generated EBO (index) buffer and insert data into it with same size as `indicesSize`
+	// Use generated EBO (index) buffer and insert data into it with same size as `indicesSize`
 	// EBO buffers allow us to re-use existing vertices, limiting amount of GPU needed (duplicate vertices require more memory)
 	// EBO buffers must be made up of unsigned integers
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize, indices, GL_STATIC_DRAW);
 
-	// defining we want position (vertex attribute) coordinates to be at index 0, and how opengl should interpret what consitutes as a vertex from our buffer data in `glBufferData`
+	// Defining we want position (vertex attribute) coordinates to be at index 0, and how opengl should interpret what consitutes as a vertex from our buffer data in `glBufferData`
 	// 5th arg is `stride` which is the amount of bytes between each vertex (size of each vertex); so that opengl knows how many bytes to jump in the buffer to the next vertex
 	// 6th arg is `pointer` which is the offset in bytes of the attributes in a vertex; e.g. A single vertex may have attributes: position, texture coordinate, normal
 		// `pointer` is the offset of those in bytes in the buffer; e.g. position (offset is 0 since it's first), texture coordinate (12 bytes forward/offset), normal (20 bytes)...
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+    // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
+    // Remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0); 
 
-	// uncomment this call to draw in wireframe polygons
+	// Uncomment this call to draw in wireframe polygons
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	return vaoId;
@@ -187,8 +192,8 @@ void utilsFunctions::processWindowSizeChange(
 	int width,
 	int height
 ) {
-    // make sure the viewport matches the new window dimensions; note that width and 
-    // height will be significantly larger than specified on retina displays
+    // Make sure the viewport matches the new window dimensions; note that width and 
+    // Height will be significantly larger than specified on retina displays
     glViewport(0, 0, width, height);
 }
 
