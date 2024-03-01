@@ -20,10 +20,11 @@ set(GLAD_LIB_VAR glad)
 set(GLAD_H_VAR glad_h)
 set(GLAD_KHR_VAR glad_khr)
 set(FUNCTIONS_VAR functions)
+set(VERTEX_BUFFER_VAR vertex_buffer)
+set(INDEX_BUFFER_VAR index_buffer)
 
 # Adds a subdirectory to the build; must contain CMakeLists.txt file
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/glfw)
-# changed the includes in glad.c, glad.h, and khrplatform.h to use relative path;
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/glad)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
@@ -42,4 +43,6 @@ target_link_libraries(
 	${GLFW_LIB_VAR}
 	${GLAD_LIB_VAR}
 	${FUNCTIONS_VAR}
+	${VERTEX_BUFFER_VAR}
+	${INDEX_BUFFER_VAR}
 )

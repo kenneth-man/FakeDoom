@@ -6,35 +6,11 @@
 #include <filesystem>
 #include <sstream>
 #include <string>
-#include "./src/utils/functions/functions.h"
-
-// Macro to wrap an opengl function call to check and log errors
-// `#x` converts `x` to a string
-// `\` allows you to line break onto seperate lines
-#define gLCall(x) glClearError();\
-	x;\
-	glLogError(#x, __FILE__, __LINE__)
+#include "functions.h"
+#include "IndexBuffer.h"
+#include "VertexBuffer.h"
 
 using namespace std;
-
-static void glClearError() {
-	// `GL_NO_ERROR` is guaranteed to be 0
-	while (glGetError() != GL_NO_ERROR) {}
-}
-
-static void glLogError(
-	const char *function,
-	const char *file,
-	int line
-) {
-	// Will keep running unless `error` variable is not 0
-	while (GLenum error = glGetError()) {
-		cout << "==========================" << '\n' <<
-		"OpenGL Error: " << error << '\n' <<
-		"Function: " << function << '\n' <<
-		"File: " << file << ":" << line << endl;
-	}
-}
 
 struct ShaderProgramSrc {
 	string vertexSrc;
@@ -108,6 +84,12 @@ static unsigned int compileShader(
 	return shaderId;
 }
 
+// A shader is a program that runs on your GPU; we can create a vertext, geometry and fragment shader to override GPU defaults (or they may not exist)
+// These shaders are compiled, linked and run on our GPU `glCompileShader`, whilst our C++ program runs on our CPU
+// Vertex shader = transforms each vertex's 3D position in virtual space to the 2D coordinate on the screen (in a window)
+	// and gets called for each vertex that is rendered
+// Fragment (pixel) shader = defines RGBA (red, green, blue, alpha) colors for each pixel being processed
+	// and gets called for each pixel that needs to get rasterized (process of drawing to screen, where a window is just a pixel array)
 static unsigned int createShaders(
 	const string &vertexShaderSrc,
 	const string &fragmentShaderSrc
@@ -134,15 +116,15 @@ static unsigned int createShaders(
 
 int main(int argc, char *argv[]) {
 	float vertices[] = {
-        0.5f, 0.5f, 0.0f,  // Top right vertex
-        0.5f, -0.5f, 0.0f,  // Bottom right vertex
+		0.5f, 0.5f, 0.0f,  // Top right vertex
+		0.5f, -0.5f, 0.0f,  // Bottom right vertex
 		-0.5f, -0.5f, 0.0f,  // Bottom left vertex
 		-0.5f, 0.5f, 0.0f   // Top left vertex
-    };
-    unsigned int indices[] = {
-        0, 1, 3,  // First triangle
-        1, 2, 3   // Second triangle
-    };
+	};
+	unsigned int indices[] = {
+		0, 1, 3,  // First triangle
+		1, 2, 3   // Second triangle
+	};
 	int windowWidth;
 	int windowHeight;
 
@@ -167,12 +149,14 @@ int main(int argc, char *argv[]) {
 	float r {0.0f};
 	float increment {0.05f};
 
-	// Telling OpenGL how it should interpret the vertex data in memory and how it should connect the vertex data to the vertex shader's attributes
-	unsigned int vaoId {utilsFunctions::linkVertexAttributes(vertices, sizeof(vertices), indices, sizeof(indices))};
+	VertexBuffer vb(vertices, sizeof(vertices));
+	IndexBuffer ib(indices, sizeof(indices) / sizeof(indices[0]));
 
-	// Render loop
-	// 1 iteration == 1 frame
-    while (!glfwWindowShouldClose(window)) {
+	// Telling OpenGL how it should interpret the vertex data in memory and how it should connect the vertex data to the vertex shader's attributes
+	unsigned int vaoId {utilsFunctions::linkVertexAttributes()};
+
+	// Render loop; 1 iteration == 1 frame
+	while (!glfwWindowShouldClose(window)) {
 		utilsFunctions::processInput(window);
 		utilsFunctions::setBackground(0.0f, 0.5f, 0.5f, 1.0f);
 
@@ -187,17 +171,18 @@ int main(int argc, char *argv[]) {
 		glUniform4f(location, r, 0.0f, 0.0f, 1.0f);
 
 		glBindVertexArray(vaoId);
+		ib.bind();
 
 		// Draws the currently bound buffer
 		// If no EBO buffer (aka index buffer), then use `glDrawArrays(GL_TRIANGLES, 0, 3);`
-		gLCall(glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, nullptr));
+		glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, nullptr);
 
-        // Swap front and back buffers
-        glfwSwapBuffers(window);
+		// Swap front and back buffers
+		glfwSwapBuffers(window);
 
-        // Poll IO events (keys pressed/released, mouse moved etc.)
-        glfwPollEvents();
-    }
+		// Poll IO events (keys pressed/released, mouse moved etc.)
+		glfwPollEvents();
+	}
 
     glfwTerminate();
 
