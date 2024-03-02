@@ -5,7 +5,7 @@ cd ..
 rm -rf build
 mkdir build
 cd build
-cmake .. -DGLFW_BUILD_DOCS=OFF
+cmake .. -DGLFW_BUILD_DOCS=OFF -G "Visual Studio 17 2022"
 cmake --build .
 
 # prevent WSL terminal automatically closing if run in vscode
