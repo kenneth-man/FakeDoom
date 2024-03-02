@@ -1,3 +1,5 @@
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/IndexBuffer)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/utils)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/VertexArray)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/VertexBuffer)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/VertexBufferLayout)

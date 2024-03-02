@@ -9,6 +9,7 @@
 #include "functions.h"
 #include "IndexBuffer.h"
 #include "VertexBuffer.h"
+#include "VertexArray.h"
 
 using namespace std;
 
@@ -149,11 +150,15 @@ int main(int argc, char *argv[]) {
 	float r {0.0f};
 	float increment {0.05f};
 
-	VertexBuffer vb(vertices, sizeof(vertices));
-	IndexBuffer ib(indices, sizeof(indices) / sizeof(indices[0]));
+	VertexArray va;
+	VertexBuffer vb {vertices, sizeof(vertices)};
+	VertexBufferLayout layout;
 
-	// Telling OpenGL how it should interpret the vertex data in memory and how it should connect the vertex data to the vertex shader's attributes
-	unsigned int vaoId {utilsFunctions::linkVertexAttributes()};
+	// `3` because we intend that each vertex consists of 3 floats (xyz positions)
+	layout.push(GL_FLOAT, 3, GL_FALSE);
+	va.addBuffer(vb, layout);
+
+	IndexBuffer ib {indices, sizeof(indices) / sizeof(indices[0])};
 
 	// Render loop; 1 iteration == 1 frame
 	while (!glfwWindowShouldClose(window)) {
@@ -167,10 +172,10 @@ int main(int argc, char *argv[]) {
 		}
 
 		r += increment;
-		
+
 		glUniform4f(location, r, 0.0f, 0.0f, 1.0f);
 
-		glBindVertexArray(vaoId);
+		va.bind();
 		ib.bind();
 
 		// Draws the currently bound buffer

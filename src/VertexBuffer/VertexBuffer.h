@@ -4,6 +4,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+// Vertex buffers are just areas of memory (on GPU) that contain data (bytes), usually vertex data attributes (positions, normals, texture coords...)
+// They have no concept of the meaning of the data 
+// Stored in GPU memory so prevents GPU-CPU communication bottleneck, improve efficiency
 class VertexBuffer {
 	private:
 		unsigned int m_RendererID;

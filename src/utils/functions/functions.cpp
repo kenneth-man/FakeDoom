@@ -65,28 +65,6 @@ void utilsFunctions::initGLAD(
 	glViewport(0, 0, width, height);
 }
 
-unsigned int utilsFunctions::linkVertexAttributes() {
-	unsigned int vaoId;
-
-	// VAOs (stored in CPU memory); tells OpenGL how to find and use vertex data in VBOs (vertex buffers) when rendering
-	// VBOs (stored in GPU memory, so prevents GPU-CPU communication bottleneck, improve efficiency) stores the actual vertex data attributes (positions, normals, texture coords...)
-	// `glVertexAttribPointer` links a VAO with the currently bound VBO
-    glGenVertexArrays(1, &vaoId);
-    glBindVertexArray(vaoId);
-
-	// Defining we want position (vertex attribute) coordinates to be at index 0, and how opengl should interpret what consitutes as a vertex from our buffer data in `glBufferData`
-	// 5th arg is `stride` which is the amount of bytes between each vertex (size of each vertex); so that opengl knows how many bytes to jump in the buffer to the next vertex
-	// 6th arg is `pointer` which is the offset in bytes of the attributes in a vertex; e.g. A single vertex may have attributes: position, texture coordinate, normal
-		// `pointer` is the offset of those in bytes in the buffer; e.g. position (offset is 0 since it's first), texture coordinate (12 bytes forward/offset), normal (20 bytes)...
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-	// Uncomment this call to draw in wireframe polygons
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-	return vaoId;
-}
-
 void utilsFunctions::processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
