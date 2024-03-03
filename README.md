@@ -7,11 +7,5 @@
 
 ## Setup
 1. ### Install CMake and MSVC C++ Compiler (e.g. Install Visual Studio Community Edition)
-2. ### Make sure your system can run bash scripts (e.g. Windows subsystem for Linux is recommended for Windows users)
-2. ### In the root directory:
-```
-git submodule update --init --recursive
-cd scripts
-.\clean_build_without_exit.sh
-.\execute_debug.sh
-```
+2. ### In the root directory run `git submodule update --init --recursive`
+3. ### In Visual Studio select `x64-Release` configuration and run `FakeDoom.exe (Debug\FakeDoom.exe)`

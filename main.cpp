@@ -76,6 +76,7 @@ static unsigned int compileShader(
 			break;
 		case GL_FRAGMENT_SHADER:
 			errMsg = "Fragment shader compilation failed";
+			break;
 		default:
 			errMsg = "Compilation failed";
 	}
@@ -134,9 +135,9 @@ int main(int argc, char *argv[]) {
 	utilsFunctions::initGLAD(windowWidth, windowHeight);
 	
 	// The `.exe` file path will be the same regardless when executing debug or release
-	// e.g. `build/Debug/FakeDoom.exe` or `build/Release/FakeDoom.exe`
+	// e.g. `out\build\x64-Debug\Debug\FakeDoom.exe` or `out\build\x64-Debug\Debug\FakeDoom.exe`
 	ShaderProgramSrc src {parseShader(
-		filesystem::current_path().parent_path().parent_path().string() +
+		filesystem::current_path().parent_path().parent_path().parent_path().parent_path().string() +
 		"\\res\\shaders\\basic.shader"
 	)};
 	unsigned int programId {createShaders(src.vertexSrc, src.fragmentSrc)};
