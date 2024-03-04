@@ -2,119 +2,14 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <algorithm>
-#include <fstream>
 #include <filesystem>
-#include <sstream>
-#include <string>
 #include "functions.h"
 #include "IndexBuffer.h"
 #include "VertexBuffer.h"
 #include "VertexArray.h"
+#include "Shader.h"
 
 using namespace std;
-
-struct ShaderProgramSrc {
-	string vertexSrc;
-	string fragmentSrc;
-};
-
-static ShaderProgramSrc parseShader(
-	const string &filePath
-) {
-	enum struct ShaderType {
-		NONE = -1,
-		VERTEX = 0,
-		FRAGMENT = 1
-	};
-	ifstream stream(filePath);
-
-	if (!stream.is_open()) {
-		utilsFunctions::handleError(
-			"Could not find shader source file: " +
-			filePath +
-			'\n' +
-			"Current working directory: " +
-			filesystem::current_path().string()
-		);
-	}
-
-	string line;
-	stringstream ss[2];
-	ShaderType type {ShaderType::NONE};
-
-	while (getline(stream, line)) {
-		if (line.find("#shader") != string::npos) {
-			if (line.find("vertex") != string::npos) {
-				type = ShaderType::VERTEX;
-			} else if (line.find("fragment") != string::npos) {
-				type = ShaderType::FRAGMENT;
-			}
-		} else {
-			ss[static_cast<int>(type)] << line << '\n';
-		}
-	}
-
-	return {
-		ss[0].str(),
-		ss[1].str()
-	};
-}
-
-static unsigned int compileShader(
-	unsigned int type,
-	const string &shaderSrc
-) {
-	unsigned int shaderId {glCreateShader(type)};
-	const char *cShaderSrc = shaderSrc.c_str();
-	glShaderSource(shaderId, 1, &cShaderSrc, nullptr);
-	glCompileShader(shaderId);
-	string errMsg;
-
-	switch (type) {
-		case GL_VERTEX_SHADER:
-			errMsg = "Vertex shader compilation failed";
-			break;
-		case GL_FRAGMENT_SHADER:
-			errMsg = "Fragment shader compilation failed";
-			break;
-		default:
-			errMsg = "Compilation failed";
-	}
-
-	utilsFunctions::handleShaderCompileError(shaderId, errMsg);
-
-	return shaderId;
-}
-
-// A shader is a program that runs on your GPU; we can create a vertext, geometry and fragment shader to override GPU defaults (or they may not exist)
-// These shaders are compiled, linked and run on our GPU `glCompileShader`, whilst our C++ program runs on our CPU
-// Vertex shader = transforms each vertex's 3D position in virtual space to the 2D coordinate on the screen (in a window)
-	// and gets called for each vertex that is rendered
-// Fragment (pixel) shader = defines RGBA (red, green, blue, alpha) colors for each pixel being processed
-	// and gets called for each pixel that needs to get rasterized (process of drawing to screen, where a window is just a pixel array)
-static unsigned int createShaders(
-	const string &vertexShaderSrc,
-	const string &fragmentShaderSrc
-) {
-	unsigned int programId {glCreateProgram()};
-	unsigned int vertexShaderId {compileShader(GL_VERTEX_SHADER, vertexShaderSrc)};
-	unsigned int fragmentShaderId {compileShader(GL_FRAGMENT_SHADER, fragmentShaderSrc)};
-
-	// Link shaders to a shader program
-	glAttachShader(programId, vertexShaderId);
-	glAttachShader(programId, fragmentShaderId);
-	glLinkProgram(programId);
-	glValidateProgram(programId);
-
-	utilsFunctions::handleShaderProgramLinkError(programId, "Shader Program compilation failed");
-
-	// Cleanup the generated shader intermediate .obj files from c++ compilation
-	// Already stored inside the shader program and we no longer need them anymore
-	glDeleteShader(vertexShaderId);
-	glDeleteShader(fragmentShaderId);
-
-	return programId;
-}
 
 int main(int argc, char *argv[]) {
 	float vertices[] = {
@@ -129,27 +24,12 @@ int main(int argc, char *argv[]) {
 	};
 	int windowWidth;
 	int windowHeight;
+	float r{ 0.0f };
+	float increment{ 0.05f };
 
 	utilsFunctions::checkMainCommandArgs(argc, argv, windowWidth, windowHeight);
 	GLFWwindow *window {utilsFunctions::initGLFW(windowWidth, windowHeight)};
 	utilsFunctions::initGLAD(windowWidth, windowHeight);
-	
-	// The `.exe` file path will be the same regardless when executing debug or release
-	// e.g. `out\build\x64-Debug\Debug\FakeDoom.exe` or `out\build\x64-Debug\Debug\FakeDoom.exe`
-	ShaderProgramSrc src {parseShader(
-		filesystem::current_path().parent_path().parent_path().parent_path().parent_path().string() +
-		"\\res\\shaders\\basic.shader"
-	)};
-	unsigned int programId {createShaders(src.vertexSrc, src.fragmentSrc)};
-	glUseProgram(programId);
-
-	// Uniforms are set per draw; need to be setup before `glDrawElements` or `glDrawArrays`
-	// Attributes are set per vertex
-	// Here we are setting a uniform variable in our fragment shader
-	int location {glGetUniformLocation(programId, "uniformColor")};
-	glUniform4f(location, 1.0f, 0.0f, 0.0f, 1.0f);
-	float r {0.0f};
-	float increment {0.05f};
 
 	VertexArray va;
 	VertexBuffer vb {vertices, sizeof(vertices)};
@@ -161,20 +41,26 @@ int main(int argc, char *argv[]) {
 
 	IndexBuffer ib {indices, sizeof(indices) / sizeof(indices[0])};
 
+	// The `.exe` file path will be the same regardless whether executing debug or release
+	// e.g. `build/Debug/FakeDoom.exe` or `build/Release/FakeDoom.exe`
+	Shader shader(
+		filesystem::current_path().parent_path().parent_path().parent_path().parent_path().string() +
+		"\\res\\shaders\\basic.shader"
+	);
+	shader.bind();
+	shader.setUniform4f("uniformColor", r, 0.0f, 0.0f, 1.0f); // "u_Color"
+	va.unbind();
+	vb.unbind();
+	ib.unbind();
+	shader.unbind();
+
 	// Render loop; 1 iteration == 1 frame
 	while (!glfwWindowShouldClose(window)) {
 		utilsFunctions::processInput(window);
 		utilsFunctions::setBackground(0.0f, 0.5f, 0.5f, 1.0f);
 
-		if (r > 1.0f) {
-			increment = -0.05f;
-		} else if (r < 0.0f) {
-			increment = 0.05f;
-		}
-
-		r += increment;
-
-		glUniform4f(location, r, 0.0f, 0.0f, 1.0f);
+		shader.bind();
+		shader.setUniform4f("uniformColor", r, 0.0f, 0.0f, 1.0f); // "u_Color"
 
 		va.bind();
 		ib.bind();
@@ -182,6 +68,15 @@ int main(int argc, char *argv[]) {
 		// Draws the currently bound buffer
 		// If no EBO buffer (aka index buffer), then use `glDrawArrays(GL_TRIANGLES, 0, 3);`
 		glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, nullptr);
+
+		if (r > 1.0f) {
+			increment = -0.05f;
+		}
+		else if (r < 0.0f) {
+			increment = 0.05f;
+		}
+
+		r += increment;
 
 		// Swap front and back buffers
 		glfwSwapBuffers(window);

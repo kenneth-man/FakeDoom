@@ -24,6 +24,7 @@ set(VERTEX_BUFFER_VAR vertex_buffer)
 set(VERTEX_BUFFER_LAYOUT_VAR vertex_buffer_layout)
 set(INDEX_BUFFER_VAR index_buffer)
 set(VERTEX_ARRAY_VAR vertex_array)
+set(SHADER_VAR shader)
 
 # Adds a subdirectory to the build; must contain CMakeLists.txt file
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/glfw)
@@ -49,4 +50,5 @@ target_link_libraries(
 	${VERTEX_BUFFER_LAYOUT_VAR}
 	${INDEX_BUFFER_VAR}
 	${VERTEX_ARRAY_VAR}
+	${SHADER_VAR}
 )
