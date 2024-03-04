@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 3.26.3)
 # Project name
 project(FakeDoom)
 
+set(CMAKE_CXX_COMPILER_VERSION 19.38.33134.0)
+
 # Create executable for 'main.cpp'
 add_executable(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
 
@@ -13,6 +15,11 @@ target_compile_features(
 	PRIVATE
 	cxx_std_17
 )
+
+# set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
+# set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
+# set(CMAKE_CXX_EXTENSIONS OFF)
+# target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
 # Variables
 set(GLFW_LIB_VAR glfw)
@@ -24,6 +31,7 @@ set(VERTEX_BUFFER_VAR vertex_buffer)
 set(VERTEX_BUFFER_LAYOUT_VAR vertex_buffer_layout)
 set(INDEX_BUFFER_VAR index_buffer)
 set(VERTEX_ARRAY_VAR vertex_array)
+set(SHADER_VAR shader)
 
 # Adds a subdirectory to the build; must contain CMakeLists.txt file
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/glfw)
@@ -49,4 +57,5 @@ target_link_libraries(
 	${VERTEX_BUFFER_LAYOUT_VAR}
 	${INDEX_BUFFER_VAR}
 	${VERTEX_ARRAY_VAR}
+	${SHADER_VAR}
 )
