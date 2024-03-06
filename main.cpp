@@ -3,11 +3,12 @@
 #include <iostream>
 #include <algorithm>
 #include <filesystem>
-#include "functions.h"
-#include "IndexBuffer.h"
-#include "VertexBuffer.h"
-#include "VertexArray.h"
-#include "Shader.h"
+#include "./src/utils/functions/functions.h"
+#include "./src/IndexBuffer/IndexBuffer.h"
+#include "./src/VertexBuffer/VertexBuffer.h"
+#include "./src/VertexArray/VertexArray.h"
+#include "./src/Shader/Shader.h"
+#include "./src/Renderer/Renderer.h"
 
 using namespace std;
 
@@ -24,8 +25,8 @@ int main(int argc, char *argv[]) {
 	};
 	int windowWidth;
 	int windowHeight;
-	float r{ 0.0f };
-	float increment{ 0.05f };
+	float r {0.0f};
+	float increment {0.05f};
 
 	utilsFunctions::checkMainCommandArgs(argc, argv, windowWidth, windowHeight);
 	GLFWwindow *window {utilsFunctions::initGLFW(windowWidth, windowHeight)};
@@ -54,20 +55,18 @@ int main(int argc, char *argv[]) {
 	ib.unbind();
 	shader.unbind();
 
+	Renderer renderer;
+
 	// Render loop; 1 iteration == 1 frame
 	while (!glfwWindowShouldClose(window)) {
 		utilsFunctions::processInput(window);
-		utilsFunctions::setBackground(0.0f, 0.5f, 0.5f, 1.0f);
+		renderer.clear();
+		renderer.setBackground(0.0f, 0.5f, 0.5f, 1.0f);
 
 		shader.bind();
 		shader.setUniform4f("uniformColor", r, 0.0f, 0.0f, 1.0f); // "u_Color"
 
-		va.bind();
-		ib.bind();
-
-		// Draws the currently bound buffer
-		// If no EBO buffer (aka index buffer), then use `glDrawArrays(GL_TRIANGLES, 0, 3);`
-		glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, nullptr);
+		renderer.draw(va, ib, shader);
 
 		if (r > 1.0f) {
 			increment = -0.05f;

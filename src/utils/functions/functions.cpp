@@ -81,16 +81,6 @@ void utilsFunctions::processWindowSizeChange(
     glViewport(0, 0, width, height);
 }
 
-void utilsFunctions::setBackground(
-	float r,
-	float g,
-	float b,
-	float a
-) {
-	glClearColor(r, g, b, a);
-	glClear(GL_COLOR_BUFFER_BIT);
-}
-
 void utilsFunctions::handleError(
 	string message,
 	bool shouldGlfwTerminate

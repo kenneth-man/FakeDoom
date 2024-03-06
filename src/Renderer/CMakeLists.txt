@@ -1,11 +1,11 @@
 add_library(
-	${SHADER_VAR}
+	${RENDERER_VAR}
 	STATIC
-	${CMAKE_CURRENT_SOURCE_DIR}/Shader.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Renderer.cpp
 )
 
 target_include_directories(
-	${SHADER_VAR}
+	${RENDERER_VAR}
 	PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}
 	${CMAKE_SOURCE_DIR}/external/glad

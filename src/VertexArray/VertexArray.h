@@ -3,8 +3,8 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "VertexBuffer.h"
-#include "VertexBufferLayout.h"
+#include "../VertexBuffer/VertexBuffer.h"
+#include "../VertexBufferLayout/VertexBufferLayout.h"
 
 // Vertex arrays tie together a vertex buffer with a 'layout' (vertices, positions, types, size...)
 // Vertex array object is opengl's method of storing the vertex array state
