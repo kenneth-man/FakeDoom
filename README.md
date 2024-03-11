@@ -3,6 +3,7 @@
 - ### C++
 - ### OpenGL (GLFW)
 - ### GLAD
+- ### STB Image
 - ### Catch2
 
 ## Setup

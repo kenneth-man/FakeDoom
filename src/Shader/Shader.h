@@ -33,6 +33,8 @@ public:
 
 	void bind() const;
 	void unbind() const;
+	void setUniform1i(const string &name, int value);
+	void setUniform1f(const string &name, float value);
 	void setUniform4f(const string& name, float v0, float v1, float v2, float v3);
 };
 

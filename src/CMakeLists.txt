@@ -1,6 +1,7 @@
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/IndexBuffer)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Renderer)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Shader)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Texture)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/utils)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/VertexArray)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/VertexBuffer)

@@ -9,15 +9,25 @@
 #include "./src/VertexArray/VertexArray.h"
 #include "./src/Shader/Shader.h"
 #include "./src/Renderer/Renderer.h"
+#include "./src/Texture/Texture.h"
 
 using namespace std;
 
 int main(int argc, char *argv[]) {
 	float vertices[] = {
-		0.5f, 0.5f, 0.0f,  // Top right vertex
-		0.5f, -0.5f, 0.0f,  // Bottom right vertex
-		-0.5f, -0.5f, 0.0f,  // Bottom left vertex
-		-0.5f, 0.5f, 0.0f   // Top left vertex
+		// Top right vertex
+		0.5f, 0.5f, 0.0f,
+			// Top right vertex texture coordinates
+			1.0f, 1.0f, 0.0f,
+		// Bottom right vertex
+		0.5f, -0.5f, 0.0f,
+			1.0f, 0.0f, 0.0f,
+		// Bottom left vertex
+		-0.5f, -0.5f, 0.0f,
+			0.0f, 0.0f, 0.0f,
+		// Top left vertex
+		-0.5f, 0.5f, 0.0f,
+			0.0f, 1.0f, 0.0f
 	};
 	unsigned int indices[] = {
 		0, 1, 3,  // First triangle
@@ -38,6 +48,7 @@ int main(int argc, char *argv[]) {
 
 	// `3` because we intend that each vertex consists of 3 floats (xyz positions)
 	layout.push(GL_FLOAT, 3, GL_FALSE);
+	layout.push(GL_FLOAT, 3, GL_FALSE);
 	va.addBuffer(vb, layout);
 
 	IndexBuffer ib {indices, sizeof(indices) / sizeof(indices[0])};
@@ -54,6 +65,16 @@ int main(int argc, char *argv[]) {
 	vb.unbind();
 	ib.unbind();
 	shader.unbind();
+
+	Texture texture(
+		filesystem::current_path().string() +
+		"res\\textures\\bricks.png"
+	);
+
+	// our `bind` method binds texture to slot 0 by default
+	// `setUniform1i` slot should match the same slot
+	texture.bind();
+	shader.setUniform1i("u_Texture", 0);
 
 	Renderer renderer;
 
