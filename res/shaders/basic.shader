@@ -10,6 +10,8 @@ void main()
 	v_TexCoord = texCoord;
 };
 
+// fragment shader runs for every pixel
+// We need to know the precise location in the texture (v_TexCoord) to draw the pixel
 #shader fragment
 #version 330 core
 layout(location = 0) out vec4 color;

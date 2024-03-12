@@ -3,14 +3,14 @@
 // Uniforms are set per draw; need to be setup before `glDrawElements` or `glDrawArrays`
 // Attributes are set per vertex
 // Here we are setting a uniform variable in our fragment shader
-int Shader::getUniformLocation(const string& name) {
+int Shader::getUniformLocation(const string &name) {
 	// We cache the uniform location so we don't have to `glGetUniformLocation` every time we `setUniform4f`
 	// Retrieving location via `glGetUniformLocation` again and again... can be slow
 	if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end()) {
 		return m_UniformLocationCache[name];
 	}
 
-	int location{ glGetUniformLocation(m_RendererID, name.c_str()) };
+	int location {glGetUniformLocation(m_RendererID, name.c_str())};
 
 	if (location == -1) {
 		cout << "Warning: uniform '" << name << "' doesn't exist" << endl;
@@ -67,12 +67,12 @@ ShaderProgramSrc Shader::parseShader() {
 // Fragment (pixel) shader = defines RGBA (red, green, blue, alpha) colors for each pixel being processed
 	// and gets called for each pixel that needs to get rasterized (process of drawing to screen, where a window is just a pixel array)
 unsigned int Shader::createShaders(
-	const string& vertexShaderSrc,
-	const string& fragmentShaderSrc
+	const string &vertexShaderSrc,
+	const string &fragmentShaderSrc
 ) {
-	unsigned int programId{ glCreateProgram() };
-	unsigned int vertexShaderId{ compileShader(GL_VERTEX_SHADER, vertexShaderSrc) };
-	unsigned int fragmentShaderId{ compileShader(GL_FRAGMENT_SHADER, fragmentShaderSrc) };
+	unsigned int programId {glCreateProgram()};
+	unsigned int vertexShaderId {compileShader(GL_VERTEX_SHADER, vertexShaderSrc)};
+	unsigned int fragmentShaderId {compileShader(GL_FRAGMENT_SHADER, fragmentShaderSrc)};
 
 	// Link shaders to a shader program
 	glAttachShader(programId, vertexShaderId);
@@ -92,10 +92,10 @@ unsigned int Shader::createShaders(
 
 unsigned int Shader::compileShader(
 	unsigned int type,
-	const string& shaderSrc
+	const string &shaderSrc
 ) {
-	unsigned int shaderId{ glCreateShader(type) };
-	const char* cShaderSrc = shaderSrc.c_str();
+	unsigned int shaderId {glCreateShader(type)};
+	const char *cShaderSrc {shaderSrc.c_str()};
 	glShaderSource(shaderId, 1, &cShaderSrc, nullptr);
 	glCompileShader(shaderId);
 	string errMsg;
@@ -120,7 +120,7 @@ Shader::Shader(const string& filePath)
 {
 	// The `.exe` file path will be the same regardless when executing debug or release
 	// e.g. `build/Debug/FakeDoom.exe` or `build/Release/FakeDoom.exe`
-	ShaderProgramSrc src{ parseShader() };
+	ShaderProgramSrc src {parseShader()};
 	m_RendererID = createShaders(src.vertexSrc, src.fragmentSrc);
 }
 

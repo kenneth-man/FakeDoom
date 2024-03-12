@@ -1,6 +1,6 @@
 #include "./Texture.h"
 
-Texture::Texture(const string& path)
+Texture::Texture(const string &path)
 	: m_RendererID(0), m_FilePath(path), m_LocalBuffer(nullptr),
 		m_Width(0), m_Height(0), m_BPP(0)
 {
@@ -8,8 +8,9 @@ Texture::Texture(const string& path)
 	// Opengl expects texture pixels to start at bottom left, not top left (.png)
 	stbi_set_flip_vertically_on_load(1);
 
-	// Load texture data into local buffer
-	// Passing pointers/addresses to `stbi_load` so it can write to them
+	// Load texture data (image) into local buffer
+	// Passing pointers/addresses to `stbi_load`,
+		// so it can write to them (to set the width, height, bits per pixel...)
 	// `4` channels for rgba
 	m_LocalBuffer = stbi_load(path.c_str(), &m_Width, &m_Height, &m_BPP, 4);
 
@@ -44,7 +45,6 @@ Texture::Texture(const string& path)
 		// Could use the buffer data for anything else, but we don't need it
 		stbi_image_free(m_LocalBuffer);
 	}
-
 }
 
 Texture::~Texture() {
@@ -52,6 +52,7 @@ Texture::~Texture() {
 	glDeleteTextures(1, &m_RendererID);
 }
 
+// We can bind multiple textures using slots; One bind per slot
 void Texture::bind(unsigned int slot) const {
 	// Set the slot we want to bind our next texture to
 	// `GL_TEXTURE0` is the first texture slot

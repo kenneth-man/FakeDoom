@@ -16,18 +16,18 @@ using namespace std;
 int main(int argc, char *argv[]) {
 	float vertices[] = {
 		// Top right vertex
-		0.5f, 0.5f, 0.0f,
+		0.5f, 0.5f,// 0.0f,
 			// Top right vertex texture coordinates
-			1.0f, 1.0f, 0.0f,
+			1.0f, 1.0f,
 		// Bottom right vertex
-		0.5f, -0.5f, 0.0f,
-			1.0f, 0.0f, 0.0f,
+		0.5f, -0.5f,// 0.0f,
+			1.0f, 0.0f,
 		// Bottom left vertex
-		-0.5f, -0.5f, 0.0f,
-			0.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f,// 0.0f,
+			0.0f, 0.0f,
 		// Top left vertex
-		-0.5f, 0.5f, 0.0f,
-			0.0f, 1.0f, 0.0f
+		-0.5f, 0.5f,// 0.0f,
+			0.0f, 1.0f
 	};
 	unsigned int indices[] = {
 		0, 1, 3,  // First triangle
@@ -37,28 +37,31 @@ int main(int argc, char *argv[]) {
 	int windowHeight;
 	float r {0.0f};
 	float increment {0.05f};
+	string rootDir {filesystem::current_path()
+		.parent_path().parent_path().parent_path().parent_path().string()};
 
 	utilsFunctions::checkMainCommandArgs(argc, argv, windowWidth, windowHeight);
 	GLFWwindow *window {utilsFunctions::initGLFW(windowWidth, windowHeight)};
 	utilsFunctions::initGLAD(windowWidth, windowHeight);
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
 
 	VertexArray va;
 	VertexBuffer vb {vertices, sizeof(vertices)};
 	VertexBufferLayout layout;
 
 	// `3` because we intend that each vertex consists of 3 floats (xyz positions)
-	layout.push(GL_FLOAT, 3, GL_FALSE);
-	layout.push(GL_FLOAT, 3, GL_FALSE);
+	layout.push(GL_FLOAT, 2, GL_FALSE);
+	layout.push(GL_FLOAT, 2, GL_FALSE);
 	va.addBuffer(vb, layout);
 
 	IndexBuffer ib {indices, sizeof(indices) / sizeof(indices[0])};
 
 	// The `.exe` file path will be the same regardless whether executing debug or release
 	// e.g. `build/Debug/FakeDoom.exe` or `build/Release/FakeDoom.exe`
-	Shader shader(
-		filesystem::current_path().parent_path().parent_path().parent_path().parent_path().string() +
-		"\\res\\shaders\\basic.shader"
-	);
+	Shader shader(rootDir + "\\res\\shaders\\basic.shader");
+
 	shader.bind();
 	shader.setUniform4f("uniformColor", r, 0.0f, 0.0f, 1.0f); // "u_Color"
 	va.unbind();
@@ -66,12 +69,9 @@ int main(int argc, char *argv[]) {
 	ib.unbind();
 	shader.unbind();
 
-	Texture texture(
-		filesystem::current_path().string() +
-		"res\\textures\\bricks.png"
-	);
+	Texture texture(rootDir + "\\res\\textures\\bricks.png");
 
-	// our `bind` method binds texture to slot 0 by default
+	// Our `bind` method binds a texture to slot 0 by default if no args
 	// `setUniform1i` slot should match the same slot
 	texture.bind();
 	shader.setUniform1i("u_Texture", 0);
